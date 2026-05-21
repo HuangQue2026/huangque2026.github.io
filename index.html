@@ -1,11 +1,273 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>健康快乐每一天</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background-color: #f0f4f0;
+            line-height: 1.8;
+            color: #444;
+        }
+
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding-bottom: 60px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4a9e6b 0%, #3d8a5c 100%);
+            color: #fff;
+            padding: 28px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .header .subtitle {
+            font-size: 18px;
+            opacity: 0.95;
+            font-weight: 400;
+        }
+
+        .article {
+            padding: 20px 18px;
+        }
+
+        .meta {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6db385 0%, #4a9e6b 100%);
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .author-info {
+            flex: 1;
+        }
+
+        .author-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .publish-time {
+            font-size: 15px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .content {
+            margin-bottom: 20px;
+        }
+
+        .content p {
+            font-size: 20px;
+            color: #444;
+            line-height: 2;
+            margin-bottom: 16px;
+            text-indent: 2em;
+        }
+
+        .content .highlight {
+            background: linear-gradient(180deg, transparent 60%, #e8f5e9 60%);
+            padding: 0 4px;
+        }
+
+        .featured-image {
+            width: 100%;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: block;
+        }
+
+        .read-more {
+            padding: 18px 15px;
+            background: #f9fbf9;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .read-more p {
+            font-size: 18px;
+            color: #5a8b6b;
+            text-align: center;
+            line-height: 1.8;
+        }
+
+        .button-section {
+            padding: 30px 18px;
+            text-align: center;
+            /* background: linear-gradient(180deg, #fafcfa 0%, #f5f7f5 100%); */
+        }
+
+        .heart-icon {
+            width: 52px;
+            height: 52px;
+            margin: 0 auto 24px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .heart-icon svg {
+            width: 48px;
+            height: 48px;
+            color: red !important;
+        }
+
+        .read-original-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #4a9e6b 0%, #3d8a5c 100%);
+            color: #fff;
+            text-decoration: none;
+            padding: 18px 70px;
+            border-radius: 35px;
+            font-size: 22px;
+            font-weight: 600;
+            box-shadow: 0 6px 18px rgba(74, 158, 107, 0.35);
+            transition: all 0.3s ease;
+            letter-spacing: 2px;
+        }
+
+        .read-original-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(74, 158, 107, 0.45);
+        }
+
+        .read-original-btn:active {
+            transform: translateY(0);
+        }
+
+        .button-hint {
+            font-size: 16px;
+            color: #999;
+            margin-top: 18px;
+            line-height: 1.6;
+        }
+
+        .footer {
+            padding: 35px 18px 25px;
+            text-align: center;
+        }
+
+        .footer-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6db385 0%, #4a9e6b 100%);
+            margin: 0 auto 14px;
+        }
+
+        .footer-text {
+            font-size: 16px;
+            color: #999;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                width: 100%;
+            }
+
+            .article {
+                padding: 16px 15px;
+            }
+
+            .content p {
+                font-size: 19px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .read-original-btn {
+                font-size: 20px;
+                padding: 16px 55px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello HUQNGQUE</h1>
+    <div class="container">
+        <div class="header">
+            <h1>健康生活，从点滴做起</h1>
+            <p class="subtitle">关注养生 · 关爱家人</p>
+        </div>
+
+        <div class="article">
+            <div class="meta">
+                <div class="avatar"></div>
+                <div class="author-info">
+                    <div class="author-name">健康生活小助手</div>
+                    <div class="publish-time">今日分享</div>
+                </div>
+            </div>
+
+            <div class="content">
+                <p>随着年龄的增长，越来越多的朋友开始关注<span class="highlight">养生与健康</span>这个话题。合理的生活方式，不仅能让我们每天都充满活力，也能让家人更加安心。</p>
+                <p>保持心情愉快、饮食均衡、适度运动，这三者缺一不可。每天饭后散散步，喝一杯温水，少油少盐，这些看似简单的小习惯，却能带来长久的好处。</p>
+                <p>下面为大家整理了一些实用的日常养生小知识，希望能帮助您和您的家人，一起过上更健康、更舒心的生活。</p>
+            </div>
+
+            <img class="featured-image" src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80" alt="健康养生">
+
+            <div class="read-more">
+                <p>了解更多日常养生知识，请点击下方按钮继续阅读</p>
+            </div>
+        </div>
+
+        <div class="button-section">
+            <div class="heart-icon">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M24 42L7 25.5C3.5 22 3 17 5.5 13C9 7.5 17 6.5 22 11.5L24 13.5L26 11.5C31 6.5 39 7.5 42.5 13C45 17 44.5 22 41 25.5L24 42Z" fill="#e8534a" stroke="#e8534a" stroke-width="2"/>
+                </svg>
+            </div>
+            <a id="readOriginalLink" href="https://example.com" class="read-original-btn">了解更多</a>
+            <p class="button-hint">点击上方按钮，查看完整健康养生内容</p>
+        </div>
+    </div>
+
+    <script>
+        // ========== 配置区域 ==========
+        // 在这里修改跳转链接
+        var CONFIG = {
+            readOriginalUrl: 'https://example.com'  // 了解更多按钮的跳转链接
+        };
+        // ========== 配置区域结束 ==========
+
+        // 应用配置
+        var linkElement = document.getElementById('readOriginalLink');
+        if (linkElement && CONFIG.readOriginalUrl) {
+            linkElement.href = CONFIG.readOriginalUrl;
+        }
+    </script>
 </body>
 </html>
