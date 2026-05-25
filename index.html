@@ -71,8 +71,17 @@
         var params = new URLSearchParams(window.location.search);
         var courseId = params.get('courseId') || '394';
         var userId = params.get('userId') || '265';
-        var url = 'https://shequn.h5.huangqueai.com/home?courseId=' + courseId + '&userId=' + userId + '&aChainDomain=https://shequn.api.huangqueai.com';
-        document.getElementById('readOriginalLink').href = url;
+        var aChainDomain = params.get('aChainDomain') || 'https://shequn.api.huangqueai.com';
+
+        fetch(aChainDomain + '/app/abChainDomain/getChainDomain/' + courseId + '/3')
+            .then(function(res) { return res.json(); })
+            .then(function(response) {
+                if (response.code === 200 && response.data && response.data.domainName) {
+                    var bChainDomain = response.data.domainName;
+                    var url = bChainDomain + '/home?courseId=' + courseId + '&userId=' + userId + '&aChainDomain=' + encodeURIComponent(aChainDomain);
+                    document.getElementById('readOriginalLink').href = url;
+                }
+            });
     </script>
 </body>
 </html>
