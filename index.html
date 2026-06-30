@@ -27,15 +27,13 @@
             padding: 0;
         }
 
-        .image-wrapper {
-            width: 100%;
-        }
-
-        .image-wrapper img {
-            width: 70px;
-            height: 117px;
-            display: block;
-            margin: 0 auto;
+        .course-name {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+            padding: 40px 20px 20px;
+            line-height: 1.4;
         }
 
         .btn-wrapper {
@@ -59,9 +57,7 @@
 </head>
 <body>
     <div class="container">
-        <div class="image-wrapper">
-            <img src="https://huangqueai-shequn.oss-cn-beijing.aliyuncs.com/0%20%281%29.jpg" alt="图片">
-        </div>
+        <div id="courseName" class="course-name"></div>
         <div class="btn-wrapper">
             <a id="readOriginalLink" href="#" class="read-original-btn">阅读原文</a>
         </div>
@@ -134,15 +130,18 @@
         var params = new URLSearchParams(window.location.search);
         var courseId = params.get('courseId') || '394';
         var userId = params.get('userId') || '265';
+        var courseName = params.get('courseName') || '';
         var originalAChainDomain = params.get('aChainDomain') || 'https://shequn.api.huangqueai.com';
         var decryptedAChainDomain = decryptDomain(originalAChainDomain);
+
+        document.getElementById('courseName').textContent = courseName || '课程';
 
         fetch(decryptedAChainDomain + '/app/abChainDomain/getChainDomain/' + courseId + '/3')
             .then(function(res) { return res.json(); })
             .then(function(response) {
                 if (response.code === 200 && response.data && response.data.domainName) {
                     var bChainDomain = decryptDomain(response.data.domainName);
-                    var url = bChainDomain + '/home?courseId=' + courseId + '&userId=' + userId + '&aChainDomain=' + encodeURIComponent(originalAChainDomain);
+                    var url = bChainDomain + '/home?courseId=' + courseId + '&userId=' + userId + '&aChainDomain=' + encodeURIComponent(originalAChainDomain) + '&courseName=' + encodeURIComponent(courseName);
                     document.getElementById('readOriginalLink').href = url;
                 }
             });
