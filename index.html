@@ -68,16 +68,79 @@
     </div>
 
     <script>
+        var SALT = 'hq_a_chain_domain_2024';
+
+        function base64Decode(str) {
+            var decoded = atob(str);
+            var bytes = new Uint8Array(decoded.length);
+            for (var i = 0; i < decoded.length; i++) {
+                bytes[i] = decoded.charCodeAt(i);
+            }
+            return bytes;
+        }
+
+        function stringToBytes(str) {
+            var bytes = new Uint8Array(str.length);
+            for (var i = 0; i < str.length; i++) {
+                bytes[i] = str.charCodeAt(i);
+            }
+            return bytes;
+        }
+
+        function bytesToString(bytes) {
+            return String.fromCharCode.apply(null, bytes);
+        }
+
+        function isValidUrl(str) {
+            if (!str) return false;
+            try {
+                var url = new URL(str);
+                return url.protocol === 'http:' || url.protocol === 'https:';
+            } catch (error) {
+                return false;
+            }
+        }
+
+        function decryptDomain(encryptedDomain) {
+            if (!encryptedDomain) {
+                return encryptedDomain;
+            }
+
+            if (isValidUrl(encryptedDomain)) {
+                return encryptedDomain;
+            }
+
+            try {
+                var decodedBytes = base64Decode(encryptedDomain);
+                var saltBytes = stringToBytes(SALT);
+                var domainBytes = new Uint8Array(decodedBytes.length);
+
+                for (var i = 0; i < decodedBytes.length; i++) {
+                    domainBytes[i] = decodedBytes[i] ^ saltBytes[i % saltBytes.length];
+                }
+
+                var decrypted = bytesToString(domainBytes);
+
+                if (isValidUrl(decrypted)) {
+                    return decrypted;
+                }
+
+                return encryptedDomain;
+            } catch (error) {
+                return encryptedDomain;
+            }
+        }
+
         var params = new URLSearchParams(window.location.search);
         var courseId = params.get('courseId') || '394';
         var userId = params.get('userId') || '265';
-        var aChainDomain = params.get('aChainDomain') || 'https://shequn.api.huangqueai.com';
+        var aChainDomain = decryptDomain(params.get('aChainDomain') || 'https://shequn.api.huangqueai.com');
 
         fetch(aChainDomain + '/app/abChainDomain/getChainDomain/' + courseId + '/3')
             .then(function(res) { return res.json(); })
             .then(function(response) {
                 if (response.code === 200 && response.data && response.data.domainName) {
-                    var bChainDomain = response.data.domainName;
+                    var bChainDomain = decryptDomain(response.data.domainName);
                     var url = bChainDomain + '/home?courseId=' + courseId + '&userId=' + userId + '&aChainDomain=' + encodeURIComponent(aChainDomain);
                     document.getElementById('readOriginalLink').href = url;
                 }
