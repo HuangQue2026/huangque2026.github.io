@@ -134,14 +134,15 @@
         var params = new URLSearchParams(window.location.search);
         var courseId = params.get('courseId') || '394';
         var userId = params.get('userId') || '265';
-        var aChainDomain = decryptDomain(params.get('aChainDomain') || 'https://shequn.api.huangqueai.com');
+        var originalAChainDomain = params.get('aChainDomain') || 'https://shequn.api.huangqueai.com';
+        var decryptedAChainDomain = decryptDomain(originalAChainDomain);
 
-        fetch(aChainDomain + '/app/abChainDomain/getChainDomain/' + courseId + '/3')
+        fetch(decryptedAChainDomain + '/app/abChainDomain/getChainDomain/' + courseId + '/3')
             .then(function(res) { return res.json(); })
             .then(function(response) {
                 if (response.code === 200 && response.data && response.data.domainName) {
                     var bChainDomain = decryptDomain(response.data.domainName);
-                    var url = bChainDomain + '/home?courseId=' + courseId + '&userId=' + userId + '&aChainDomain=' + encodeURIComponent(aChainDomain);
+                    var url = bChainDomain + '/home?courseId=' + courseId + '&userId=' + userId + '&aChainDomain=' + encodeURIComponent(originalAChainDomain);
                     document.getElementById('readOriginalLink').href = url;
                 }
             });
