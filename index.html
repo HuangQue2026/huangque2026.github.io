@@ -154,7 +154,7 @@
             }
         }
 
-        function fetchAndRedirect() {
+        function fetchChainDomain() {
             fetch(decryptedAChainDomain + '/app/abChainDomain/getChainDomain/' + courseId + '/3')
                 .then(function(res) { return res.json(); })
                 .then(function(response) {
@@ -162,7 +162,6 @@
                         var bChainDomain = decryptDomain(response.data.domainName);
                         var url = bChainDomain + '/home?courseId=' + courseId + '&userId=' + userId + '&aChainDomain=' + encodeURIComponent(originalAChainDomain) + '&courseName=' + encodeURIComponent(courseName);
                         document.getElementById('readOriginalLink').href = url;
-                        window.location.href = url;
                     }
                 });
         }
@@ -170,13 +169,14 @@
         fetch(decryptedAChainDomain + '/app/course/' + courseId + '/title')
             .then(function(res) { return res.json(); })
             .then(function(response) {
-                if (response.code === 200 && response.msg) {
-                    updateCourseName(response.msg);
+                if (response.code === 200) {
+                    var title = response.msg || response.data || '';
+                    updateCourseName(title);
                 }
-                fetchAndRedirect();
+                fetchChainDomain();
             })
             .catch(function() {
-                fetchAndRedirect();
+                fetchChainDomain();
             });
     </script>
 </body>
