@@ -40,6 +40,13 @@
             line-height: 1.4;
         }
 
+        .loading {
+            font-size: 14px;
+            color: #999;
+            text-align: center;
+            padding: 10px;
+        }
+
         .btn-wrapper {
             padding: 24px 18px 40px;
             width: 100%;
@@ -61,8 +68,9 @@
 </head>
 <body>
     <div class="container">
-        <div id="courseName" class="course-name"></div>
-        <div class="btn-wrapper">
+        <div id="courseName" class="course-name">加载中...</div>
+        <div id="loading" class="loading">正在获取课程信息...</div>
+        <div id="btnWrapper" class="btn-wrapper" style="display: none;">
             <a id="readOriginalLink" href="#" class="read-original-btn">阅读原文</a>
         </div>
     </div>
@@ -163,6 +171,12 @@
                         var url = bChainDomain + '/home?courseId=' + courseId + '&userId=' + userId + '&aChainDomain=' + encodeURIComponent(originalAChainDomain) + '&courseName=' + encodeURIComponent(courseName);
                         document.getElementById('readOriginalLink').href = url;
                     }
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('btnWrapper').style.display = 'block';
+                })
+                .catch(function() {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('btnWrapper').style.display = 'block';
                 });
         }
 
