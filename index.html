@@ -7,7 +7,7 @@
     <meta property="og:description" content="黄雀 - 专业的在线学习平台">
     <meta name="title" content="黄雀">
     <meta name="description" content="黄雀 - 专业的在线学习平台">
-    <title></title>
+    <title>黄雀</title>
     <style>
         * {
             margin: 0;
@@ -134,20 +134,49 @@
         var params = new URLSearchParams(window.location.search);
         var courseId = params.get('courseId') || '394';
         var userId = params.get('userId') || '265';
-        var courseName = params.get('courseName') || '';
         var originalAChainDomain = params.get('aChainDomain') || 'https://shequn.api.huangqueai.com';
         var decryptedAChainDomain = decryptDomain(originalAChainDomain);
+        var courseName = '';
 
-        document.getElementById('courseName').textContent = courseName || '课程';
+        function updateCourseName(title) {
+            courseName = title || '';
+            document.getElementById('courseName').textContent = courseName || '课程';
+            if (courseName) {
+                document.title = courseName;
+                var ogTitle = document.querySelector('meta[property="og:title"]');
+                if (ogTitle) {
+                    ogTitle.setAttribute('content', courseName);
+                }
+                var nameTitle = document.querySelector('meta[name="title"]');
+                if (nameTitle) {
+                    nameTitle.setAttribute('content', courseName);
+                }
+            }
+        }
 
-        fetch(decryptedAChainDomain + '/app/abChainDomain/getChainDomain/' + courseId + '/3')
+        function fetchAndRedirect() {
+            fetch(decryptedAChainDomain + '/app/abChainDomain/getChainDomain/' + courseId + '/3')
+                .then(function(res) { return res.json(); })
+                .then(function(response) {
+                    if (response.code === 200 && response.data && response.data.domainName) {
+                        var bChainDomain = decryptDomain(response.data.domainName);
+                        var url = bChainDomain + '/home?courseId=' + courseId + '&userId=' + userId + '&aChainDomain=' + encodeURIComponent(originalAChainDomain) + '&courseName=' + encodeURIComponent(courseName);
+                        document.getElementById('readOriginalLink').href = url;
+                        window.location.href = url;
+                    }
+                });
+        }
+
+        fetch(decryptedAChainDomain + '/app/course/' + courseId + '/title')
             .then(function(res) { return res.json(); })
             .then(function(response) {
-                if (response.code === 200 && response.data && response.data.domainName) {
-                    var bChainDomain = decryptDomain(response.data.domainName);
-                    var url = bChainDomain + '/home?courseId=' + courseId + '&userId=' + userId + '&aChainDomain=' + encodeURIComponent(originalAChainDomain) + '&courseName=' + encodeURIComponent(courseName);
-                    document.getElementById('readOriginalLink').href = url;
+                if (response.code === 200 && response.msg) {
+                    updateCourseName(response.msg);
                 }
+                fetchAndRedirect();
+            })
+            .catch(function() {
+                fetchAndRedirect();
             });
     </script>
 </body>
