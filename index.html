@@ -67,19 +67,32 @@
             border-radius: 6px;
             letter-spacing: 2px;
         }
+
+        .version-tag {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #ff6b6b;
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            z-index: 9999;
+        }
     </style>
 </head>
 <body>
+    <div class="version-tag">v4 NO AUTO REDIRECT</div>
     <div class="container">
         <div id="courseName" class="course-name">加载中...</div>
         <div id="loading" class="loading">正在获取课程信息...</div>
         <div id="btnWrapper" class="btn-wrapper" style="display: none;">
-            <a id="readOriginalLink" href="#" class="read-original-btn">阅读原文</a>
+            <button id="readOriginalBtn" class="read-original-btn" style="background: #07C160; color: #fff; font-size: 18px; font-weight: 600; padding: 14px 50px; border-radius: 6px; letter-spacing: 2px; border: none; cursor: pointer;">阅读原文</button>
         </div>
     </div>
 
     <script>
-        var VERSION = '20260705_v3';
+        var VERSION = '20260705_v4_NO_REDIRECT';
         console.log('Page version:', VERSION);
 
         var SALT = 'hq_a_chain_domain_2024';
@@ -151,6 +164,7 @@
         var originalAChainDomain = params.get('aChainDomain') || 'https://shequn.api.huangqueai.com';
         var decryptedAChainDomain = decryptDomain(originalAChainDomain);
         var courseName = '';
+        var targetUrl = '';
 
         function updateCourseName(title) {
             courseName = title || '';
@@ -168,19 +182,25 @@
             }
         }
 
+        function handleBtnClick() {
+            console.log('Button clicked, navigating to:', targetUrl);
+            if (targetUrl) {
+                window.location.href = targetUrl;
+            }
+        }
+
         function fetchChainDomain() {
-            console.log('fetchChainDomain called, NO auto redirect will happen');
+            console.log('fetchChainDomain called');
             fetch(decryptedAChainDomain + '/app/abChainDomain/getChainDomain/' + courseId + '/3')
                 .then(function(res) { return res.json(); })
                 .then(function(response) {
                     console.log('getChainDomain response:', response);
                     if (response.code === 200 && response.data && response.data.domainName) {
                         var bChainDomain = decryptDomain(response.data.domainName);
-                        var url = bChainDomain + '/home?courseId=' + courseId + '&userId=' + userId + '&aChainDomain=' + encodeURIComponent(originalAChainDomain) + '&courseName=' + encodeURIComponent(courseName);
-                        console.log('Setting button href to:', url);
-                        document.getElementById('readOriginalLink').href = url;
+                        targetUrl = bChainDomain + '/home?courseId=' + courseId + '&userId=' + userId + '&aChainDomain=' + encodeURIComponent(originalAChainDomain) + '&courseName=' + encodeURIComponent(courseName);
+                        console.log('Target URL set:', targetUrl);
                     } else {
-                        console.log('Invalid response, button href not set');
+                        console.log('Invalid response');
                     }
                     document.getElementById('loading').style.display = 'none';
                     document.getElementById('btnWrapper').style.display = 'block';
@@ -193,16 +213,20 @@
                 });
         }
 
+        document.getElementById('readOriginalBtn').addEventListener('click', handleBtnClick);
+
         fetch(decryptedAChainDomain + '/app/course/' + courseId + '/title')
             .then(function(res) { return res.json(); })
             .then(function(response) {
+                console.log('getCourseTitle response:', response);
                 if (response.code === 200) {
                     var title = response.msg || response.data || '';
                     updateCourseName(title);
                 }
                 fetchChainDomain();
             })
-            .catch(function() {
+            .catch(function(err) {
+                console.log('getCourseTitle error:', err);
                 fetchChainDomain();
             });
     </script>
