@@ -87,8 +87,6 @@
     </div>
 
     <script>
-       
-
         var SALT = 'hq_a_chain_domain_2024';
 
         function base64Decode(str) {
@@ -152,11 +150,41 @@
             }
         }
 
+        function decodeVerifyToken(verifyToken) {
+            if (!verifyToken) {
+                return null;
+            }
+            try {
+                var normalizedToken = verifyToken
+                    .replace(/-/g, '+')
+                    .replace(/_/g, '/');
+                var padding = (4 - normalizedToken.length % 4) % 4;
+                normalizedToken += '='.repeat(padding);
+
+                var binaryStr = atob(normalizedToken);
+                var bytes = new Uint8Array(binaryStr.length);
+                for (var i = 0; i < binaryStr.length; i++) {
+                    bytes[i] = binaryStr.charCodeAt(i);
+                }
+                var decodedToken = new TextDecoder('utf-8').decode(bytes);
+
+                var parts = decodedToken.split('|');
+                if (parts.length >= 4) {
+                    return {
+                        courseId: parseInt(parts[0]),
+                        userId: parseInt(parts[1]),
+                        encryptDomain: parts[2],
+                        title: parts[3]
+                    };
+                }
+            } catch (error) {
+                console.warn('verifyToken decode error:', error);
+            }
+            return null;
+        }
+
         var params = new URLSearchParams(window.location.search);
-        var courseId = params.get('courseId') || '394';
-        var userId = params.get('userId') || '265';
-        var originalAChainDomain = params.get('aChainDomain') || 'https://shequn.api.huangqueai.com';
-        var decryptedAChainDomain = decryptDomain(originalAChainDomain);
+        var verifyToken = params.get('verifyToken') || '';
         var courseName = '';
         var targetUrl = '';
 
@@ -183,46 +211,59 @@
             }
         }
 
-        function fetchChainDomain() {
-            console.log('fetchChainDomain called');
-            fetch(decryptedAChainDomain + '/app/abChainDomain/getChainDomain/' + courseId + '/3')
-                .then(function(res) { return res.json(); })
-                .then(function(response) {
-                    console.log('getChainDomain response:', response);
-                    if (response.code === 200 && response.data && response.data.domainName) {
-                        var bChainDomain = decryptDomain(response.data.domainName);
-                        targetUrl = bChainDomain + '/home?courseId=' + courseId + '&userId=' + userId + '&aChainDomain=' + encodeURIComponent(originalAChainDomain) + '&courseName=' + encodeURIComponent(courseName);
-                        console.log('Target URL set:', targetUrl);
-                    } else {
-                        console.log('Invalid response');
-                    }
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('btnWrapper').style.display = 'block';
-                    console.log('Button shown, waiting for user click...');
-                })
-                .catch(function(err) {
-                    console.log('fetchChainDomain error:', err);
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('btnWrapper').style.display = 'block';
-                });
+        function fetchCourseInfo() {
+            console.log('fetchCourseInfo called with verifyToken:', verifyToken);
+            if (!verifyToken) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('btnWrapper').style.display = 'block';
+                return;
+            }
+
+            var tokenInfo = decodeVerifyToken(verifyToken);
+            console.log('Decoded token info:', tokenInfo);
+
+            if (tokenInfo && tokenInfo.title) {
+                updateCourseName(tokenInfo.title);
+            }
+
+            var decryptedAChainDomain = '';
+            if (tokenInfo && tokenInfo.encryptDomain) {
+                decryptedAChainDomain = decryptDomain(tokenInfo.encryptDomain);
+                console.log('Decrypted AChainDomain:', decryptedAChainDomain);
+            } else {
+                decryptedAChainDomain = 'https://shequn.api.huangqueai.com';
+            }
+
+            if (tokenInfo && tokenInfo.courseId) {
+                fetch(decryptedAChainDomain + '/app/abChainDomain/getChainDomain/' + tokenInfo.courseId + '/3')
+                    .then(function(res) { return res.json(); })
+                    .then(function(response) {
+                        console.log('getChainDomain response:', response);
+                        if (response.code === 200 && response.data && response.data.domainName) {
+                            var bChainDomain = decryptDomain(response.data.domainName);
+                            targetUrl = bChainDomain + '/home?verifyToken=' + encodeURIComponent(verifyToken);
+                            console.log('Target URL set:', targetUrl);
+                        } else {
+                            console.log('Invalid response');
+                        }
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('btnWrapper').style.display = 'block';
+                        console.log('Button shown, waiting for user click...');
+                    })
+                    .catch(function(err) {
+                        console.log('fetchChainDomain error:', err);
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('btnWrapper').style.display = 'block';
+                    });
+            } else {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('btnWrapper').style.display = 'block';
+            }
         }
 
         document.getElementById('readOriginalBtn').addEventListener('click', handleBtnClick);
 
-        fetch(decryptedAChainDomain + '/app/course/' + courseId + '/title')
-            .then(function(res) { return res.json(); })
-            .then(function(response) {
-                console.log('getCourseTitle response:', response);
-                if (response.code === 200) {
-                    var title = response.msg || response.data || '';
-                    updateCourseName(title);
-                }
-                fetchChainDomain();
-            })
-            .catch(function(err) {
-                console.log('getCourseTitle error:', err);
-                fetchChainDomain();
-            });
+        fetchCourseInfo();
     </script>
 </body>
 </html>
